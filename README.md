@@ -1,167 +1,115 @@
-# ![](https://ga-dash.s3.amazonaws.com/production/assets/logo-9f88ae6c9c3871690e33280fcf557f33.png) Project 3: Web APIs & NLP
+# ![](https://ga-dash.s3.amazonaws.com/production/assets/logo-9f88ae6c9c3871690e33280fcf557f33.png) Project 3: Reddit NPL Challenge
 
-### Description
-
-In week four we've learned about a few different classifiers. In week five we'll learn about webscraping, APIs, and Natural Language Processing (NLP). This project will put those skills to the test.
-
-For project 3, your goal is two-fold:
-1. Using [Pushshift's](https://github.com/pushshift/api) API, you'll collect posts from two subreddits of your choosing.
-2. You'll then use NLP to train a classifier on which subreddit a given post came from. This is a binary classification problem.
-
-
-#### About the API
-
-Pushshift's API is fairly straightforward. For example, if I want the posts from [`/r/boardgames`](https://www.reddit.com/r/boardgames), all I have to do is use the following url: https://api.pushshift.io/reddit/search/submission?subreddit=boardgames
-
-To help you get started, we have a primer video on how to use the API: https://youtu.be/AcrjEWsMi_E
-
-**NOTE:** Pushshift now limits you to 100 posts per request (no longer the 500 in the screencast).
-
+### Problem Statement
 ---
 
-### Requirements
+Buying a home is stressful, especially for first time buyers. This project sets out to help make their life easier. To be more specific, the project aims to build a prediction model for the sale price of a house based on the Ames dataset, which contains information of 2051 houses in Ames, Iowa from 2006 to 2010. The model should achieve considerable accuracy to provide reliable price estimate reference for the home buyers and should also serves as a guide to indicate important features when it comes to house purchasing.
 
-- Gather and prepare your data using the `requests` library.
-- **Create and compare two models**. One of these must be a Random Forest classifier, however the other can be a classifier of your choosing: logistic regression, KNN, SVM, etc.
-- A Jupyter Notebook with your analysis for a peer audience of data scientists.
-- An executive summary of your results.
-- A short presentation outlining your process and findings for a semi-technical audience.
 
-**Pro Tip:** You can find a good example executive summary [here](https://www.proposify.biz/blog/executive-summary).
 
+
+### Data Cleaning
 ---
 
-### Necessary Deliverables / Submission
+The data provided has 81 features and requires substaintial cleaning due to a great number of missing values, redundancies, inappropriate data types and outliers. For missing values, I dropped the columns with over 80% missing values. For those I kept, I found out that a good amount of them were just the features that specific house doesn't have. So I imputed them with 0. For the rest, I imputed mean for numerical features and the most frequent value for categorical features (including ordinal categorical features that have integer as their value output). 
 
-- Code and executive summary must be in a clearly commented Jupyter Notebook.
-- You must submit your slide deck.
-- Materials must be submitted by **10:00 AM on Friday, October 23rd**.
+I then fixed inappropriate data types. Notably the non-ordinal category features whose values are integer, such as ms subclass, month sold, year sold, other year values in the dataset. I also converted the values of ordinal categorical features into numbers rather than strings.
 
+I also fixed some obvious data error, for example the garage year built has a max value of 2207, which is likely a typo. As for the outliers, I dropped two houses that has unusually large square footage however very lower sale price. 
+
+
+
+
+### Feature Engineering
+---
+The features provided have some redundancies and will possibly lead to multicollinearity in modeling. Therefore I consolidated these features and created 1) total square footage that sums up total ground living area sf, total basement sf, and garage are sf; 2) total bath that sums up all full bath and half bath including the ones in the basement. I considered half bath as one bath rather than half to avoid float numbers. 3) total bedrooms. 
+
+Notice that year values are tricky to work with as they are categorical but in numerical form, I created age columns to solve this issue. I engineered age since the house was built, since it was last remodeled and since the garage was built so it could be more straightforward to work with. 
+
+In addition, I engineered a feature multiplying two features that are most strongly correlated with the sale price: total square footage and overall quality.
+
+
+### Data Dictionary
 ---
 
-## Rubric
-Your local instructor will evaluate your project (for the most part) using the following criteria.  You should make sure that you consider and/or follow most if not all of the considerations/recommendations outlined below **while** working through your project.
+The data dictionary below contains the features I used for my production model.
 
-For Project 3 the evaluation categories are as follows:<br>
-**The Data Science Process**
-- Problem Statement
-- Data Collection
-- Data Cleaning & EDA
-- Preprocessing & Modeling
-- Evaluation and Conceptual Understanding
-- Conclusion and Recommendations
-
-**Organization and Professionalism**
-- Organization
-- Visualizations
-- Python Syntax and Control Flow
-- Presentation
-
-**Scores will be out of 30 points based on the 10 categories in the rubric.** <br>
-*3 points per section*<br>
-
-| Score | Interpretation |
-| --- | --- |
-| **0** | *Project fails to meet the minimum requirements for this item.* |
-| **1** | *Project meets the minimum requirements for this item, but falls significantly short of portfolio-ready expectations.* |
-| **2** | *Project exceeds the minimum requirements for this item, but falls short of portfolio-ready expectations.* |
-| **3** | *Project meets or exceeds portfolio-ready expectations; demonstrates a thorough understanding of every outlined consideration.* |
+|Feature|Type|Dataset|Description|
+|---|---|---|---|
+|**total_sqft**|*integer*|train|total square footage including the total ground living area, basement and garage, excluding any patio area|
+|**total_bath**|*integer*|train|total bathroom number including full bath, half bath, basement full bath and half bath|
+|**total_bedroom**|*integer*|train|total bedroom number |
+|**neighborhood**|*object*|train|physical locations within Ames city limits|
+|**overall_qual**|*integer*|train|overall material and finish quality (scale 1 to 10)|
+|**exter_qual**|*integer*|train|exterior material quality (scale 1 to 5)|
+|**kitchen_qual**|*integer*|train|kitchen quality (scale 1 to 5)|
+|**bsmt_qual**|*integer*|train|basement quality (scale 1 to 5)|
+|**fireplace_qu**|*integer*|train|fireplace quality (scale 1 to 5)|
+|**garage_finish**|*integer*|train|interior finish of the garage (scale 0 to 3)|
+|**fireplaces**|*integer*|train|number of fireplaces|
+|**mas_vnr_area**|*integer*|train|masonry veneer area in square feet|
+|**garage_cars**|*integer*|train|size of garage in car capacity|
+|**age_sold**|*integer*|train|age when sold since built |
+|**age_since_remodl**|*integer*|train|age since last remodel or addition|
+|**yr_sold**|*object*|train|year the house was sold|
+|**total_sqft * overall_qual**|*integer*|train|the value of total square feet multiplied by overall quality|
+|**overall_cond**|*integer*|train|overall condition rating (scale 1 to 10)|
+|**ms_subclass**|*object*|train|the building class|
+|**saleprice**|*integer*|train/ test|sale price of the house|
 
 
-### The Data Science Process
+### Exploratory Data Analysis
+---
+The distribution of our target variable is right skewed, which is understandable considering fewer people buy expensive homes. However the skewed distribution might affect the homoscedasticity of our model in the later stage. Therefore I'm considering performing log transformation on the variable.   
 
-**Problem Statement**
-- Is it clear what the goal of the project is?
-- What type of model will be developed?
-- How will success be evaluated?
-- Is the scope of the project appropriate?
-- Is it clear who cares about this or why this is important to investigate?
-- Does the student consider the audience and the primary and secondary stakeholders?
-
-**Data Collection**
-- Was enough data gathered to generate a significant result?
-- Was data collected that was useful and relevant to the project?
-- Was data collection and storage optimized through custom functions, pipelines, and/or automation?
-- Was thought given to the server receiving the requests such as considering number of requests per second?
-
-**Data Cleaning and EDA**
-- Are missing values imputed/handled appropriately?
-- Are distributions examined and described?
-- Are outliers identified and addressed?
-- Are appropriate summary statistics provided?
-- Are steps taken during data cleaning and EDA framed appropriately?
-- Does the student address whether or not they are likely to be able to answer their problem statement with the provided data given what they've discovered during EDA?
-
-**Preprocessing and Modeling**
-- Is text data successfully converted to a matrix representation?
-- Are methods such as stop words, stemming, and lemmatization explored?
-- Does the student properly split and/or sample the data for validation/training purposes?
-- Does the student test and evaluate a variety of models to identify a production algorithm (**AT MINIMUM:** Bayes and one other model)?
-- Does the student defend their choice of production model relevant to the data at hand and the problem?
-- Does the student explain how the model works and evaluate its performance successes/downfalls?
-
-**Evaluation and Conceptual Understanding**
-- Does the student accurately identify and explain the baseline score?
-- Does the student select and use metrics relevant to the problem objective?
-- Does the student interpret the results of their model for purposes of inference?
-- Is domain knowledge demonstrated when interpreting results?
-- Does the student provide appropriate interpretation with regards to descriptive and inferential statistics?
-
-**Conclusion and Recommendations**
-- Does the student provide appropriate context to connect individual steps back to the overall project?
-- Is it clear how the final recommendations were reached?
-- Are the conclusions/recommendations clearly stated?
-- Does the conclusion answer the original problem statement?
-- Does the student address how findings of this research can be applied for the benefit of stakeholders?
-- Are future steps to move the project forward identified?
+![](./charts/saleprice_hist.png)
 
 
-### Organization and Professionalism
-
-**Project Organization**
-- Are modules imported correctly (using appropriate aliases)?
-- Are data imported/saved using relative paths?
-- Does the README provide a good executive summary of the project?
-- Is markdown formatting used appropriately to structure notebooks?
-- Are there an appropriate amount of comments to support the code?
-- Are files & directories organized correctly?
-- Are there unnecessary files included?
-- Do files and directories have well-structured, appropriate, consistent names?
-
-**Visualizations**
-- Are sufficient visualizations provided?
-- Do plots accurately demonstrate valid relationships?
-- Are plots labeled properly?
-- Are plots interpreted appropriately?
-- Are plots formatted and scaled appropriately for inclusion in a notebook-based technical report?
-
-**Python Syntax and Control Flow**
-- Is care taken to write human readable code?
-- Is the code syntactically correct (no runtime errors)?
-- Does the code generate desired results (logically correct)?
-- Does the code follows general best practices and style guidelines?
-- Are Pandas functions used appropriately?
-- Are `sklearn` and `NLTK` methods used appropriately?
-
-**Presentation**
-- Is the problem statement clearly presented?
-- Does a strong narrative run through the presentation building toward a final conclusion?
-- Are the conclusions/recommendations clearly stated?
-- Is the level of technicality appropriate for the intended audience?
-- Is the student substantially over or under time?
-- Does the student appropriately pace their presentation?
-- Does the student deliver their message with clarity and volume?
-- Are appropriate visualizations generated for the intended audience?
-- Are visualizations necessary and useful for supporting conclusions/explaining findings?
-
-
+### Feature Selection
 ---
 
-### Why did we choose this project for you?
-This project covers three of the biggest concepts we cover in the class: Classification Modeling, Natural Language Processing and Data Wrangling/Acquisition.
+Due to the large number of features, instead of plotting a heatmap, I did two bar charts that list the top 10 features that show the strongest positive correlation to the sale price and the top 5 strongest negative. Most of the features have an absolute correlation rate over 0.5, which is very significant. These are the features I would always prioritize in considering to include in my models.
 
-Part 1 of the project focuses on **Data wrangling/gathering/acquisition**. This is a very important skill as not all the data you will need will be in clean CSVs or a single table in SQL.  There is a good chance that wherever you land you will have to gather some data from some unstructured/semi-structured sources; when possible, requesting information from an API, but often scraping it because they don't have an API (or it's terribly documented).
+![](./charts/top10_pos_corr.png) ![](./charts/top5_neg_corr.png)
 
-Part 2 of the project focuses on **Natural Language Processing** and converting standard text data (like Titles and Comments) into a format that allows us to analyze it and use it in modeling.
 
-Part 3 of the project focuses on **Classification Modeling**.  Given that project 2 was a regression focused problem, we needed to give you a classification focused problem to practice the various models, means of assessment and preprocessing associated with classification.   
+By plotting the correlation of the intersection of total square footage and overall quality, I found a sifnificant strong linear correlation between the feature and sale price. Therefore I would strongly consider using this feature especially when improving my model.
+
+![](./charts/intersection.png)
+
+### Modeling
+---
+
+7 models were chosen to be showcased in this project. My actual number of modeling is a lot higher but these seven in my opinion will best serve as the road map to my best/production model. The model goes from simple to complex. Each model is to some extent reliant on the previous ones. I started with a null model which used the mean sale price to predict all testing data. After established the baseline, I fitted linear regression model with the features I believe to be most relevant to the sale price. To further imporve the performance of the model, I fitted the dataset to regularization models such as LASSO and Ridge, and performed log transformation. My best performed model used intersectioning of features and log transformation. The reason why I fine tuned my model step by step is that there will be trade-offs in the interpretation when the models get complex. This project is meant to be presented to a non-techinal audience therefore an ultra complex model may be hard for them to understand. That is also why I chose a log transformed model over LASSO and Ridge.
+
+
+### Evaluation
+---
+The evaluation of the modeling are divided into two parts. Online there is a Kaggle competition which will evaluate the RMSE score of the model  with 70% of the testing data. My best model scored a RMSE of 21,204.55 on Kaggle which ranks 3rd out of 48 contestants. 
+
+Locally, the model I used with train-test-split and log transformation has the best RMSE, followed by the improved log transformation and OLS model. My lasso and ridge model didn't help decrease my RMSE, however they both have over 90% in R squared score, which means that my model fits over 90% of the data. That is a relatively accurate model. I decided to use the lasso model for my production model despite the fact that it doesn't have the highest score. Based on the features I selected, I believe the regularization would help treaing all the coefficients fair. Considering the goal of this project and the audience, the lasso model would be a good combination of model performance and intepretation.  T
+
+
+![](./charts/predvstrue.png)
+
+
+Above is the chart showcasing the distribution of the residuals of the production model I selected. Overall I would conclude that my model has homoscacediticy especially in the 100k to 300k house sale price range. As the sale price goes even higher, the residual starts to fan out.
+
+### Conclusion & Findings
+---
+Should consider a combined force of total square footage & overall quality
+Houses with unusually large square footage might have smaller margin
+Stone Brook, Crawford, Clear Creek, Green Hill, and Northridge Heights are the most desirable/ expensive neighborhoods
+Iowa DOT and Rail Road,  Old Town, Northwest Ames, College Creek, and Meadow Village are the most affordable neighborhoods
+
+
+
+### Limitations & Future Studies
+---
+
+This project only scratched the surface of modeling possibilities with the data. Below are some limitations of the project:
+1. Due to georaphic discrepancies, I don't believe this model is applicable to other regions especially those whose dollar amount for square footage is significantly higher than  
+2. Since my model used lasso regularization, I standardized the data before fitting them to the model so as to keep them at the same scale. It helps making my coefficients more referencable, however, it also makes it hard for me to interpret the exact impact of each feature since they are not the original values anymore. 
+3. Although a lot of efforts were made to reduce the number of features, my production model still has 60 columns counting all the dummfied variables. Seems to me still too many features. I would like to explore a more concise model that is as well-fit.
+4. The model did not examine the statistical significance of the features selected. As a result, the result of some coefficient magnitude may be misleading. For example, there could be a neighborhood that has very few house information and their pattern of sale price could be very biased. Therefore I would suggest cross referencing the p-value with the coefficients.
+5. My problem statement is focused on residentail homes. However the original training data contains non-residential type such as agricultural or industrial properties, which I didn't drop in consideration of the consistancy with the testing data. So for my next step, I would look into dropping these values to see if they will help improve the performance of my model.
