@@ -58,7 +58,7 @@ The data dictionary below contains the features in the clean datasets for this p
 ---
 The EDA in this project provided great insights in understanding the modeling results. The EDA I performed could be broken down to four parts: individual subreddit EDA; combined EDA; top words with and without stopwords; sentiment analysis. Some key takeaways from the EDA are as follows:
 
-1. r/TalesfromRetail posts are in general longer than r/Jokes
+1. r/TalesfromRetail posts are in general longer than r/Jokes.
 
 ![](./charts/dist_of_word_count.png)
 
@@ -84,7 +84,7 @@ The EDA in this project provided great insights in understanding the modeling re
 ### Modeling & Best Model Selection
 ---
 
-Including the baseline model, I ran 8 models for this project. For each non-baseline model, I used either CountVectorizer or TfidfVectorizer to preprocess my data, using custom stop words and token pattern so that I can include "I" in the features as discussed in the EDA section. I used grid search to find the optimal parameters for logistic regression, K-nearest neighbors, naive bayes, random forest, and extra trees models. Due to the limited capacity of my computer, I did not have the luxury to test out thousands of fits for each model. As a strategy, I decided to fine tune models as I proceeded. Therefore, each model, even though with different methodology, is a little dependant from the previous one. For instance, I started with the logistic regression model with max features of 10,000 to 30,000, among other parameters. When 10,000 features return the optimal result, I then optimize for a lower number of max features and found 2,000 and 4,000. Therefore 2,000 and 4,000 became my benchmark for all the models I run afterwards. I didn't even bother to test 10,000 anymore. Same thing happend to vectorizers. I started by using both vectorizers and as I realized TfidfVectoirzer performs better on my dataset, I decide to drop CountVectorizer on the later models.
+Including the baseline model, I ran 8 models for this project. For each non-baseline model, I used either CountVectorizer or TfidfVectorizer to preprocess my data. By creating custom stop words and token pattern, I included "I" in the features as discussed in the EDA section. I used grid search to find the optimal parameters for logistic regression, K-nearest neighbors, naive bayes, random forest, and extra trees models. Due to the limited capacity of my computer, I did not have the luxury to test out thousands of fits for each model. As a strategy, I decided to fine tune models as I proceeded. Therefore, each model, even though with different methodology, is a little dependant from the previous one. For instance, I started with the logistic regression model with max features of 10,000 to 30,000, among other parameters. When 10,000 features return the optimal result, I then optimize for a lower number of max features and found 2,000 and 4,000. Therefore 2,000 and 4,000 became my benchmark for all the models I run afterwards. I didn't even bother to test 10,000 anymore. Same thing happend to vectorizers. I started by using both vectorizers and as I realized TfidfVectoirzer performs better on my dataset, I decide to drop CountVectorizer on the later models.
 
 In all models that I performed, I was able to beat the baseline model by significant amount. The top 2 highest accuracy came both from logistic regression, at 99% and 98.5%, however the number of max features used in the highest performing model is 4,000 as compared to 2,000 for the second. 
 
