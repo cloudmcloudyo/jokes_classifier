@@ -3,7 +3,7 @@
 ### Problem Statement
 ---
 
-Virtual assitants are no new words for us nowadays. We can see them everywhere from when we do online shopping, access to our bank accounts, or just at your fingertips, your smartphone. These virtual assistants are very helpful in perform specific tasks, however one thing is something: a personal touch. Intended for product managers of virtual assistants, this project sets out to build a classifier that is able to tell an intended joke from the sharing of a personal story. It aims to lay a foundation for further studies in training computers to be more empathetic, so that organization would be able to use virtual assitants to establish a stronger emotional bond with their customers, and benefit from increased customer loyalty in the long run. 
+Virtual assitants are no new words for us nowadays. We can see them everywhere from when we do online shopping, access to our bank accounts, or just at your fingertips, your smartphone. These virtual assistants are very helpful in performing specific tasks, however one thing is something: a personal touch. Intended for product managers of virtual assistants, this project sets out to build a classifier that is able to tell an intended joke from the sharing of a personal story. It aims to lay a foundation for further studies in training computers to be more empathetic, so that organization would be able to use virtual assitants to establish a stronger emotional bond with their customers, and benefit from increased customer loyalty in the long run. 
 
 
 
