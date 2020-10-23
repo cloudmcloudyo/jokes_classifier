@@ -59,9 +59,11 @@ The data dictionary below contains the features in the clean datasets for this p
 The EDA in this project provided great insights in understanding the modeling results. The EDA I performed could be broken down to four parts: individual subreddit EDA; combined EDA; top words with and without stopwords; sentiment analysis. Some key takeaways from the EDA are as follows:
 
 1. r/TalesfromRetail posts are in general longer than r/Jokes
+
 ![](./charts/dist_of_word_count.png)
 
 2. r/Jokes posts are more recent while r/TalesfromRetail posts are more spread out and go as early as more than 2 years ago.
+
 ![](./charts/dist_of_age_count.png)
 
 3. Stopwords make great difference in showing words frequency. I also realized the necessity of creating my custom stop words during the EDA since the built-in stop words lists from sklearn or nltk library both consider "I" as a stop word, however for my project, it could be a good way to distinguish a personal story and what not.
@@ -75,6 +77,7 @@ The EDA in this project provided great insights in understanding the modeling re
 ![](./charts/top_word_jokes.png)
 
 3. From the sentiment analysis, it is interesting to find that r/TalesfromRetail tends to have more extreme sentiment in posts as with very few neutral were identified, whearas r/Jokes subreddit has sentiment results more evenly distributed.
+
 ![](./charts/sentiment_analysis.png)
 
 
